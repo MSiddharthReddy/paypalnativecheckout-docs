@@ -79,21 +79,15 @@ If you would simply like to get started with the PayPal Native Checkout SDK imme
 
 ## Integrating The Checkout Experience
 
-We have tried to make integrating the PayPal Native Checkout experience into your app as painless and seamless as possible. There are multiple options available, so one can be used that best suits the application you are integrating with.
+We have tried to make integrating the PayPal Native Checkout experience into your app as painless and seamless as possible. There are multiple options available, so one can be used that best suits the application you are integrating with. 
 
-# 
-
-
-### WebView Store
-
-This scenario covers what might happen if your Application houses your Store inside a WebView. This assumes a simple setup, in which your application loads the store inside a `UIWebView`, and normally passes itself to `PayPal` and then back to your store in the `UIWebView`. 
-
-After importing the PayPal Native Checkout SDK from one of the packaged options in the documentation before now, we will `initialize` the library, and add our merchant information to our P-List file.
-
-# 
+#
 
 
 ### Setting Up Deep Linking.
+
+After importing the PayPal Native Checkout SDK from one of the packaged options in the documentation before now, we will `initialize` the library, and add our merchant information to our P-List file.
+
 Setting up a Deep Link return, so that PayPal can let your app know, that payment has been completed or cancelled. Here is how we can add a `URI Scheme` for our application using `XCode` 7 and 8. 
 
 You can modify and paste the `XML` structure below into your `Info.plist`
@@ -129,6 +123,19 @@ Now we need to add some values, that the PayPal Native Checkout SDK will use to 
 That's it, we've got all the information for the SDK into the Appliation's `Info.plist`. All that is left is invoking the SDK.
 
 ### Invoking the SDK 
+
+This step varies according to the type of application you rare using. Currently we support Web-View Stores and React-Native applications. 
+
+# 
+
+
+### WebView Store
+
+This scenario covers what might happen if your Application houses your Store inside a WebView. This assumes a simple setup, in which your application loads the store inside a `UIWebView`, and normally passes itself to `PayPal` and then back to your store in the `UIWebView`. 
+
+After importing the PayPal Native Checkout SDK from one of the packaged options in the documentation before now, we will `initialize` the library, and add our merchant information to our P-List file.
+
+# 
 
 #### Swift Integration - Special Instructions
 
@@ -255,6 +262,108 @@ func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navi
 ```
 
 That's it, you are now ready to [Test]() the integration with your application. 
+
+# 
+
+
+### Complete React-Native Store
+
+This scenario covers what might happen if your Application houses your Store in a React-Native Application. This assumes that your application has been developed using the React-Native library. If your application uses only the Web-View component of React-Native, this scenario does hold true for you. 
+
+#
+
+#### Add the FrameWork to your project
+
+* Obtain a copy of the NativeCheckout.framework, [Direct Download of Release](https://github.com/paypal/paypalcheckout-ios/raw/master/NativeCheckout.framework.zip) 
+
+* Copy unpack the archive, and copy `NativeCheckout.framework` to the root of your Swift project under a new folder named Frameworks.
+
+<img src="https://user-images.githubusercontent.com/17309023/27191456-ac314da2-51ac-11e7-921f-5e67717d32ca.png"  width="500">
+
+* Import the Framework dependency as an `Embedded Binary` in XCode using the General menu option in the Project Properties panes. 
+
+![General](https://cloud.githubusercontent.com/assets/328000/20905298/0ae19eca-baf8-11e6-9a04-6014c389bc61.png)
+
+#
+
+#### Integration Steps
+
+In-order to have access to the functions in the framework we need to create a Native module in our application. The steps below illustrate how to create and access a Native Module. 
+
+For more information on how to do this you can refer to the documentaiton provided by Facebook [here](https://facebook.github.io/react-native/docs/native-modules-ios.html).
+
+#### 1. Create a Header File to access the FrameWork.
+
+* Create a new header file named RCTPayPalUtils.h by right-clicking on your project folder > Select New File > New Header File 
+
+
+<img src="https://user-images.githubusercontent.com/17309023/27191821-db7484de-51ad-11e7-8b53-3a43ee82e3ff.png"  width="500">
+
+
+<img src="https://user-images.githubusercontent.com/17309023/27191911-2c8b6b62-51ae-11e7-8070-1807633eef8e.png"  width="500">
+
+
+<img src="https://user-images.githubusercontent.com/17309023/27191915-2e904982-51ae-11e7-8ff6-fa2435de8da5.png"  width="500">
+
+
+* Import the RCTBridge module. The image below shows a sample code on how to do it.
+
+```c
+// RCTPayPalUtils.h
+#import <React/RCTBridgeModule.h>
+
+@interface RCTPayPalUtils : NSObject <RCTBridgeModule>
+
+@end
+
+```
+
+
+#### 2. Create a new Objective-C file and import the framework.
+
+* Create a new Objective-C file by right-clicking on your project folder > Select New File > New Objective-C File 
+
+
+<img src="https://user-images.githubusercontent.com/17309023/27191821-db7484de-51ad-11e7-8b53-3a43ee82e3ff.png"  width="500">
+
+
+<img src="https://user-images.githubusercontent.com/17309023/27192074-d95a2126-51ae-11e7-8b52-1b171ead1a3d.png"  width="500">
+
+
+<img src="https://user-images.githubusercontent.com/17309023/27192077-dad214d2-51ae-11e7-8394-aadb8e6e92f3.png" width="500">
+
+
+* We will now import the framework and export the required function to React-Native's Native module component. A sample is shown in the example below.
+
+```c
+// RCTPayPalUtils.m
+
+#import "RCTPayPalUtils.h"
+#import "NativeCheckout/PYPLCheckout.h"
+#import <React/RCTLog.h>
+
+@implementation RCTPayPalUtils
+
+
+RCT_EXPORT_MODULE();
+
+RCT_EXPORT_METHOD(checkout:(NSURLRequest *) request) {
+  
+   RCTLogInfo(@"URL being sent %@", request);
+  
+  [[PYPLCheckout sharedInstance] handleIfPPCheckout: (NSURLRequest *) request];
+}
+
+@end
+
+```
+
+#### 3. Invoking Checkout from your application.
+
+The 'checkout' function is now available to be called from the Application. It is available under Native Modules.PayPalUtils. 
+Whenever you are ready with the URL you can call the 'checkout' function. A sample is shown below.
+
+<img src="https://user-images.githubusercontent.com/17309023/27192549-ae31aa94-51b0-11e7-8c86-89f42de501b5.png" width="500">
 
 ## Sample App
 
