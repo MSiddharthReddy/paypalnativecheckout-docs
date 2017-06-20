@@ -12,8 +12,8 @@ https://developer.paypal.com/
 
 The PayPal Native Checkout SDK for Android, provides a simplified way for you to provide a secure and safe payment solution for your apps. 
 
-* **Native Code Current Version** : 1.1.0
-* **Experience Bundle Version** : 1.1.0
+* **Native Code Current Version** : 1.3.0
+* **Experience Bundle Version** : 1.3.0
 * **Experience** : Chrome Custom Tab (or) Default browser on your device.
 
 For detailed version history please see our [Change Log](changelog.md).
@@ -135,7 +135,7 @@ If you would like to read more about `URI Schemes` and setting them up using the
 
 ### Invoking the SDK 
 
-As of PayPal Native Checkout SDK version `1.1.0` :
+As of PayPal Native Checkout SDK version `1.3.0` :
 
 In the activity that has the `WebView` that you want to be intercepted,
 
